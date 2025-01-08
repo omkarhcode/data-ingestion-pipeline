@@ -9,7 +9,7 @@ generator client {
 
 datasource db {
   provider = "mongodb"
-  url      = "mongodb://localhost:27017/data-ingestion-pipeline"
+  url      = env("DATABASE_URL")
 }
 
 model IngestedData {
