@@ -14,7 +14,7 @@ datasource db {
 
 model IngestedData {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  source    String
-  data      Json
+  name      String?
+  value     Float?
   timestamp DateTime @default(now())
 }
