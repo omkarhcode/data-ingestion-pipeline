@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateRecordDto } from './dto/create-record.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
 import { PrismaService } from 'nestjs-prisma';
+import { CreateMultipleRecordDto } from './dto/create-multiple-record.dto';
 
 @Injectable()
 export class RecordsService {
@@ -10,6 +11,12 @@ export class RecordsService {
   async create(createRecordDto: CreateRecordDto) {
     return this.prisma.ingestedData.create({
       data: createRecordDto,
+    });
+  }
+
+  async createMany(createMultipleRecordDto: CreateMultipleRecordDto) {
+    return await this.prisma.ingestedData.createMany({
+      data: createMultipleRecordDto.records,
     });
   }
 

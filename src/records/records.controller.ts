@@ -11,6 +11,7 @@ import {
 import { RecordsService } from './records.service';
 import { CreateRecordDto } from './dto/create-record.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
+import { CreateMultipleRecordDto } from './dto/create-multiple-record.dto';
 
 @Controller('records')
 export class RecordsController {
@@ -22,6 +23,14 @@ export class RecordsController {
     createRecordDto: CreateRecordDto,
   ) {
     return this.recordsService.create(createRecordDto);
+  }
+
+  @Post('create-many')
+  async createManyRecord(
+    @Body()
+    createMultipleRecordDto: CreateMultipleRecordDto,
+  ) {
+    return await this.recordsService.createMany(createMultipleRecordDto);
   }
 
   @Get()
