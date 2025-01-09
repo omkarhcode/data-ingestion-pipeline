@@ -1,16 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { CreateRecordDto } from './dto/create-record.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
+import { PrismaService } from 'nestjs-prisma';
 
 @Injectable()
 export class RecordsService {
-  create(createRecordDto: CreateRecordDto) {
-    return 'This action adds a new record';
+  constructor(private prisma: PrismaService) {}
+
+  async create(createRecordDto: CreateRecordDto) {
+    return this.prisma.ingestedData.create({
+      data: createRecordDto,
+    });
   }
 
-  findAll() {
-    return `This action returns all records`;
-  }
+  findAll() {}
 
   findOne(id: number) {
     return `This action returns a #${id} record`;
