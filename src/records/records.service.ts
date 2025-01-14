@@ -101,7 +101,19 @@ export class RecordsService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} record`;
+  async remove(id) {
+    try {
+      return await this.prisma.ingestedData.delete({
+        where: {
+          id,
+        },
+      });
+    } catch (error) {
+      console.log('🚀 ~ RecordsService Delete one ~ error:', error);
+      if (error.meta?.cause) {
+        throw new ForbiddenException(error.meta.cause);
+      }
+      throw new ForbiddenException(error.message);
+    }
   }
 }

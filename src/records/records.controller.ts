@@ -180,8 +180,8 @@ export class RecordsController {
     return this.recordsService.update(id, updateRecordDto);
   }
 
-  @Delete(':id')
+  @Delete('delete-one/:id')
   remove(@Param('id') id: string) {
-    return this.recordsService.remove(+id);
+    return this.recordsService.remove(id);
   }
 }
