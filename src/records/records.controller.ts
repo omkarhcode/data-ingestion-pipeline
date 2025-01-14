@@ -170,14 +170,14 @@ export class RecordsController {
     return this.recordsService.findAll(createdAt, limit, offset, search);
   }
 
-  @Get(':id')
+  @Get('find-one/:id')
   findOne(@Param('id') id: string) {
     return this.recordsService.findOne(id);
   }
 
-  @Patch(':id')
+  @Patch('update-one/:id')
   update(@Param('id') id: string, @Body() updateRecordDto: UpdateRecordDto) {
-    return this.recordsService.update(+id, updateRecordDto);
+    return this.recordsService.update(id, updateRecordDto);
   }
 
   @Delete(':id')

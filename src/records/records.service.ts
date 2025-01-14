@@ -84,8 +84,21 @@ export class RecordsService {
     }
   }
 
-  update(id: number, updateRecordDto: UpdateRecordDto) {
-    return `This action updates a #${id} record`;
+  async update(id, updateRecordDto: UpdateRecordDto) {
+    try {
+      return await this.prisma.ingestedData.update({
+        where: {
+          id,
+        },
+        data: updateRecordDto,
+      });
+    } catch (error) {
+      console.log('🚀 ~ RecordsService Update one ~ error:', error);
+      if (error.meta?.cause) {
+        throw new ForbiddenException(error.meta.cause);
+      }
+      throw new ForbiddenException(error.message);
+    }
   }
 
   remove(id: number) {
