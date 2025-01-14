@@ -17,7 +17,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  await app.listen(3000);
-  console.info('🚀 Backend server is running on port 3000');
+  await app.listen(process.env.PORT);
+  console.info(`🚀 Backend server is running on port ${process.env.PORT}`);
 }
 bootstrap();
