@@ -68,8 +68,20 @@ export class RecordsService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} record`;
+  async findOne(id) {
+    try {
+      return await this.prisma.ingestedData.findUnique({
+        where: {
+          id,
+        },
+      });
+    } catch (error) {
+      console.log('🚀 ~ RecordsService FindOne ~ error:', error);
+      if (error.meta?.cause) {
+        throw new ForbiddenException(error.meta.cause);
+      }
+      throw new ForbiddenException(error.message);
+    }
   }
 
   update(id: number, updateRecordDto: UpdateRecordDto) {
