@@ -9,6 +9,9 @@ import {
   UseInterceptors,
   BadRequestException,
   UploadedFile,
+  Query,
+  DefaultValuePipe,
+  ParseEnumPipe,
 } from '@nestjs/common';
 import { RecordsService } from './records.service';
 import { CreateRecordDto } from './dto/create-record.dto';
@@ -145,9 +148,26 @@ export class RecordsController {
     return this.recordsService.createMany(createMultipleRecordDto);
   }
 
-  @Get()
-  findAll() {
-    return this.recordsService.findAll();
+  @Get('find-all')
+  findAll(
+    @Query(
+      'createdAt',
+      new DefaultValuePipe('desc'),
+      new ParseEnumPipe(['asc', 'desc'], {
+        optional: true,
+        exceptionFactory: (errors) => {
+          return new BadRequestException(
+            `Invalid createdAt value: It must be one of the following: 'asc', 'desc'`,
+          );
+        },
+      }),
+    )
+    createdAt?: 'asc' | 'desc',
+    @Query('limit', new DefaultValuePipe(100)) limit?: number,
+    @Query('offset', new DefaultValuePipe(0)) offset?: number,
+    @Query('search') search?: string,
+  ) {
+    return this.recordsService.findAll(createdAt, limit, offset, search);
   }
 
   @Get(':id')
