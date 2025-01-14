@@ -18,6 +18,8 @@ async function bootstrap() {
     }),
   );
   await app.listen(process.env.PORT);
+  console.log('DATABASE_URL:', process.env.DATABASE_URL);
+
   console.info(`🚀 Backend server is running on port ${process.env.PORT}`);
 }
 bootstrap();
