@@ -1,9 +1,34 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { WinstonModule } from 'nest-winston';
+import { transports, format } from 'winston';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    rawBody: true,
+    logger: WinstonModule.createLogger({
+      transports: [
+        // logging all level
+        new transports.File({
+          filename: `content/app.log`,
+          format: format.combine(format.timestamp(), format.json()),
+        }),
+        // we also want to see logs in our console
+        new transports.Console({
+          format: format.combine(
+            format.cli(),
+            format.splat(),
+            format.timestamp(),
+            format.printf((info) => {
+              return `${info.timestamp} ${info.level}: ${info.message}`;
+            }),
+          ),
+        }),
+      ],
+    }),
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({
