@@ -18,6 +18,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
+import * as xlsx from 'xlsx';
 
 @Controller('records')
 export class RecordsController {
@@ -71,6 +72,65 @@ export class RecordsController {
 
     const dto = new CreateMultipleRecordDto();
     dto.records = raw.records;
+
+    const createMultipleRecordDto = plainToInstance(
+      CreateMultipleRecordDto,
+      dto,
+    );
+
+    const errors = await validate(createMultipleRecordDto);
+    if (errors.length > 0) {
+      throw new BadRequestException(errors.toString());
+    }
+
+    return this.recordsService.createMany(createMultipleRecordDto);
+  }
+
+  @Post('upload-sheet')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: memoryStorage(),
+      limits: {
+        fileSize: 10 * 1024 * 1024, // 10 MB
+      },
+      fileFilter: (req, file, callback) => {
+        console.log(
+          '🚀 ~ RecordsController ~ file.originalname:',
+          file.originalname,
+        );
+        if (
+          !file.originalname.toLowerCase().endsWith('.xlsx') &&
+          !file.originalname.toLowerCase().endsWith('.xls')
+        ) {
+          return callback(
+            new BadRequestException('Only .xlsx or .xls files are allowed'),
+            false,
+          );
+        }
+        callback(null, true);
+      },
+    }),
+  )
+  async uploadXlsxFile(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('No file provided');
+    }
+
+    let raw: any[];
+    try {
+      const workbook = xlsx.read(file.buffer, { type: 'buffer' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+
+      raw = xlsx.utils.sheet_to_json(worksheet);
+    } catch (err) {
+      throw new BadRequestException(
+        `Failed to parse XLSX file: ${err.message}`,
+      );
+    }
+
+    const dto = new CreateMultipleRecordDto();
+    dto.records = raw;
 
     const createMultipleRecordDto = plainToInstance(
       CreateMultipleRecordDto,
